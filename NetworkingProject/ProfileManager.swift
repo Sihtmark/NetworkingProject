@@ -10,6 +10,7 @@ import UIKit
 
 protocol ProfileManageable: AnyObject {
     func fetchProfile(completion: @escaping(Result<[Profile],NetworkError>) -> Void)
+    func fetchImage(completion: @escaping(Result<UIImage,NetworkError>) -> Void)
 }
 
 enum NetworkError: Error {
@@ -21,6 +22,10 @@ struct Profile: Codable {
     let userId: Int
     let id: Int
     let title: String
+}
+
+struct Image {
+    let imageView: UIImageView
 }
 
 class ProfileManager: ProfileManageable {
@@ -40,6 +45,21 @@ class ProfileManager: ProfileManageable {
                     completion(.failure(.decodingError))
                 }
         }.resume()
+    }
+    
+    func fetchImage(completion: @escaping (Result<UIImage,NetworkError>) -> Void) {
+        let url = URL(string: "https://picsum.photos/300/200")!
+            URLSession.shared.dataTask(with: url) { (data, response, error) in
+                guard let data = data, error == nil else {
+                    completion(.failure(.serverError))
+                    return
+                }
+                guard let picture = UIImage(data: data) else {
+                    completion(.failure(.decodingError))
+                    return
+                }
+                completion(.success(picture))
+            }.resume()
     }
 }
 

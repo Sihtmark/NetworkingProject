@@ -10,6 +10,7 @@ import UIKit
 class ViewController: UIViewController, UITableViewDataSource {
     
     var dataSourse = [Profile]()
+    var randomPicture = UIImage()
     let tableView = UITableView()
     let refreshControl = UIRefreshControl()
     var profileManager: ProfileManageable = ProfileManager()
@@ -17,6 +18,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     override func viewDidLoad() {
         super.viewDidLoad()
         fetchData()
+        fetchImage()
         setupTableView()
     }
 
@@ -56,6 +58,22 @@ class ViewController: UIViewController, UITableViewDataSource {
         }
     }
     
+    private func fetchImage() {
+        self.profileManager.fetchImage { result in
+            switch result {
+            case .success(let picture):
+                self.randomPicture = picture
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            case .failure(.serverError):
+                print("Picture server error")
+            case .failure(.decodingError):
+                print("Decoding error")
+            }
+        }
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataSourse.count
     }
@@ -63,6 +81,8 @@ class ViewController: UIViewController, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ProfileCell", for: indexPath) as! ProfileCell
         let post = dataSourse[indexPath.row]
+        let photo = randomPicture
+        cell.imageView1.image = photo
         cell.userIdLabel.text = String(post.userId)
         cell.idLabel.text = String(post.id)
         cell.titleLabel.text = post.title
