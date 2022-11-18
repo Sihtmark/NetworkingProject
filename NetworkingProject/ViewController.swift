@@ -14,6 +14,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     let tableView = UITableView()
     let refreshControl = UIRefreshControl()
     var profileManager: ProfileManageable = ProfileManager()
+    var pictures = [UIImage]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,6 +48,7 @@ class ViewController: UIViewController, UITableViewDataSource {
             switch result {
             case .success(let profiles):
                 self.dataSourse = profiles
+                self.dataSourse.shuffle()
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
@@ -81,9 +83,22 @@ class ViewController: UIViewController, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ProfileCell", for: indexPath) as! ProfileCell
         let post = dataSourse[indexPath.row]
-        let photo = randomPicture
-        cell.imageView1.image = photo
-        cell.userIdLabel.text = String(post.userId)
+        var profileID: String {
+            switch post.userId {
+            case  1: return "Ab ovo usque ad mala."
+            case  2: return "Ab uno disce omnes."
+            case  3: return "Nox cogitationum mater."
+            case  4: return "Pauca, sed bona."
+            case  5: return "Quid ipse sis, non guid habearis, interest."
+            case  6: return "Sine labore non erit panis in ore."
+            case  7: return "Sola virtute armatus."
+            case  8: return "Tristis est anima mea."
+            case  9: return "Vetus amor non sentit robiginem."
+            default: return "Ferrum natare doces."
+            }
+        }
+        cell.imageView1.image = randomPicture
+        cell.userIdLabel.text = profileID
         cell.idLabel.text = String(post.id)
         cell.titleLabel.text = post.title
         return cell
